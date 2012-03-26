@@ -1,0 +1,81 @@
+\documentclass[12pt]{article}
+\usepackage{geometry}
+
+%\usepackage[margin=0.2in]{geometry}                
+\geometry{letterpaper}                  
+\usepackage{graphicx}
+\usepackage{tipa}
+\usepackage{upgreek}
+\usepackage{amsmath, amssymb, amsthm}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+\newtheorem{notation}{Notation}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\Bern}{\textrm{Bern}}
+\newcommand{\Bin}{\textrm{Bin}}
+\newcommand{\Beta}{\textrm{Beta}}
+\newcommand{\Gam}{\textrm{Gamma}}
+\newcommand{\Expo}{\textrm{Expo}}
+\newcommand{\Pois}{\textrm{Pois}}
+\newcommand{\Geom}{\textrm{Geom}}
+\begin{document}
+
+
+\begin{center} \textbf{Programming Assignment 2} \end{center}
+ \vspace{-7mm} 
+\begin{flushright} Lexi Ross \& Julia Winn  \end{flushright}
+
+ \vspace{-4mm} 
+\noindent \textbf{Part 1}
+\medskip
+
+\noindent When comparing the running times of Strassen's algorithm with conventional matrix multiplication an important factor to consider is the necessary padding when running Strassen's algorithm on values of $n$ that are not powers of 2.  This can be dealt with using padding, as long as the current $n$ is even, we can divide it into equal sub matrices, and when it is odd we must pad each matrix of this size with an additional $(2n+1)$ zeros to get an even value of $n$.
+\medskip
+
+\noindent Whether or not this process takes place at the beginning of the algorithm before the sub dividing of the matrix has begun does not change the total number of zeros added.  Therefore, regardless of the nature of the process, any matrix with a non-power of 2 $n$ will need a certain number of zeros added.  The final size of the matrix post padding is the size of the matrix we will be multiplying.
+\medskip
+
+\noindent If all arithmetic operations (adding, subtracting, multiplying or dividing two real numbers) is cost 1, then we can calculate the recurrence for Strassen's algorithm by computing the base case, and all powers of $n$ that follow.
+\medskip
+
+\noindent Consider a $2 \times 2$ matrix.  It's costs using Strassen's algorithm and normal matrix multiplication can be calculated as follows:
+
+\begin{itemize}
+\item $P_1, P_2, P_3, P_4$ cost 2 each
+\item $P_5, P_6, P_7$ cost 3 each
+\item $AE + BG$ and $CF + DH$ cost 3 each
+\item $AF + BH$ and $CE + DG$ cost 1 each
+\end{itemize}
+
+\noindent T(1) = 1
+\medskip
+
+\noindent T(2) = $(2 \times 4) + (3 \times 3) + (3 \times 2) + (1 \times 2)= 8 + 9 + 6 + 2 = 25$
+\medskip
+
+\noindent T(4) =  247
+\medskip
+
+\noindent T(n) = $4((\frac{n}{2})^2 + T(\frac{n}{2})) + 3(2(\frac{n}{2})^2 + T(\frac{n}{2})) + 8(\frac{n}{2})^2$
+\bigskip
+
+\noindent Our recurrence relation for Strassen's algorithm is $T(n) = 18(\frac{n}{2})^2 + 7\cdot T(\frac{n}{2})$ where $n=2^x, n >1$
+\bigskip
+
+\noindent Using Mathematica we can solve for the recurrence relation to find:
+
+$$T(n) = 7^{\frac{\log(2n)}{\log(2)}} - 6n^2$$
+
+\noindent We know that for regular divide and conquer matrix multiplication the recurrence relation is $T(n) = 8\cdot T(\frac{n}{2}) + \Theta(n^2)$.  BUT WHAT IS $\Theta$? 4?
+% \vspace{-3mm} 
+%\begin{itemize}  \itemsep1pt \parskip0pt \parsep0pt
+
+%Padding info: http://www.eecis.udel.edu/~saunders/courses/621/03f/modelV.pdf
+
+
+
+\end{document}
