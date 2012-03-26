@@ -6,7 +6,7 @@ public class Strassen {
 	 * Just realized we may not actually need this, but
 	 * I'm keeping it here just in case.
 	 */
-	private int dotProduct(int[] v1, int[] v2) {
+	private static int dotProduct(int[] v1, int[] v2) {
 		int n = v1.length;
 		int total = 0;
 		for (int i = 0; i < n; i++) {
@@ -20,7 +20,7 @@ public class Strassen {
 	 * parameter is set to false, the second matrix will be subtracted
 	 * from the first.
 	 */
-	private Matrix add(Matrix m1, Matrix m2, boolean addition) {
+	private static Matrix add(Matrix m1, Matrix m2, boolean addition) {
 		// TODO
 		int n = m1.n;
 		int[][] ret = new int[n][n];
@@ -36,7 +36,7 @@ public class Strassen {
 		return new Matrix(ret);
 	}
 	
-	private int[] concat(int[] a, int[] b) {
+	private static int[] concat(int[] a, int[] b) {
 		int[] c = new int[a.length+b.length];
 		System.arraycopy(a, 0, c, 0, a.length);
 		System.arraycopy(b, 0, c, a.length, b.length);
@@ -44,7 +44,7 @@ public class Strassen {
 		return c;
 	}
 	
-	private Matrix combine(Matrix a, Matrix b, Matrix c, Matrix d) {
+	private static Matrix combine(Matrix a, Matrix b, Matrix c, Matrix d) {
 		int half = a.n;		
 		int n = 2*half;
 		int[][] rowsA = a.rows;
@@ -65,7 +65,7 @@ public class Strassen {
 	/*
 	 * Multiplies two matrices using the conventional method.
 	 */
-	private Matrix conventionalMultiply(Matrix m1, Matrix m2) {
+	private static Matrix conventionalMultiply(Matrix m1, Matrix m2) {
 		int n = m1.n;
 		int[][] ret = new int[n][n];
 		// i is row, j is column
@@ -81,7 +81,7 @@ public class Strassen {
 		return new Matrix(ret);
 	}
 	
-	private Matrix strassenMultiply(Matrix m1, Matrix m2, int n, int crossover) {
+	private static Matrix strassenMultiply(Matrix m1, Matrix m2, int n, int crossover) {
 		if (n <= crossover) {
 			return conventionalMultiply(m1, m2);
 		} else {
@@ -141,8 +141,24 @@ public class Strassen {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		int[][] rows1 = {{1,2},{3,4}};
+		int[][] rows2 = {{5,6},{7,8}};
+		Matrix m1 = new Matrix(rows1);
+		Matrix m2 = new Matrix(rows2);
+		Matrix sum = add(m1, m2, true);
+		Matrix diff = add(m1, m2, false);
+		Matrix product = conventionalMultiply(m1, m2);
+		Matrix combine = combine(m1, m1, m2, m2);
+		m1.print(true);
+		m2.print(true);
+		System.out.println("Sum:");
+		sum.print(true);
+		System.out.println("Difference:");
+		diff.print(true);
+		System.out.println("Product:");
+		product.print(true);
+		System.out.println("Combination:");
+		combine.print(true);
 	}
 
 }
