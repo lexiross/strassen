@@ -70,12 +70,19 @@
 
 $$T(n) = 7^{\frac{\log(2n)}{\log(2)}} - 6n^2$$
 
-\noindent We know that for regular divide and conquer matrix multiplication the recurrence relation is $T(n) = 8\cdot T(\frac{n}{2}) + \Theta(n^2)$.  BUT WHAT IS $\Theta$? 4?
+\noindent We know that for regular divide and conquer matrix multiplication the recurrence relation is $T(n) = 8\cdot T(\frac{n}{2}) + \Theta(n^2)$,  $\Theta= 4$
+\medskip
 % \vspace{-3mm} 
 %\begin{itemize}  \itemsep1pt \parskip0pt \parsep0pt
 
 %Padding info: http://www.eecis.udel.edu/~saunders/courses/621/03f/modelV.pdf
 
+\noindent Using Mathematica again we can solve for the recurrence relation to find:
+$$T(n) = n^2(5n-4)$$
+
+\noindent Using Mathematica again
+
+$$7^{(\log_2(2 n))/(\log_2(2))}-6 n^2 = n^2*(5n - 4) \to n \approx 2.98666 \approx 3$$
 
 
 \end{document}

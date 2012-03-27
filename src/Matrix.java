@@ -12,7 +12,6 @@ public class Matrix {
 	public int n;
 	
 	
-	
 	public Matrix(int[][] rows) {
 		this.rows = rows;
 		this.n = rows[0].length;
