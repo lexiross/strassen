@@ -80,20 +80,66 @@ public class Strassen {
 		return new Matrix(ret);
 	}
 	
+    // n = final size, x = the beginning of the zero padding
+    // remember row of zeros at bottom
+    private static Matrix pad(Matrix m1, int n, int x) {
+        
+            int [][] rows = new int [n][n];
+            for (int i = 0; i < n; i++) 
+            {
+                for (int j = 0; j < n; j++) 
+                {
+                    if ((i < x) && (j < x))
+                    {
+                        rows[i][j] = m1.rows[i][j];
+                    }
+                    else
+                    {
+                        rows[i][j] = 0;
+                    }
+                }
+            }
+            Matrix m2 = new Matrix(rows);
+            m2.print(true);
+            return m2;
+    }
+	
 	private static Matrix strassenMultiply(Matrix m1, Matrix m2, int n, int crossover) {
 		if (n <= crossover) {
 			return conventionalMultiply(m1, m2);
 		} else {
-			Matrix[] matrices = {m1, m2};
+            Matrix[] matrices = {m1, m2};
 			
 			// divide both matrices into four submatrices
 			Matrix a,b,c,d,e,f,g,h;
+			
+			// then padding is required
+			if ((2*n == (n^(n-1)) + 1) == false){
+			    int new_n = 2;
+			    while (new_n < n) {
+			        System.out.println(new_n);
+			        new_n *= 2;
+			    }
+			    int difference = new_n - n;
+                m1 = pad(m1, new_n, n);
+                m2 = pad(m2, new_n, n);
+                matrices[0] = m1;
+                matrices[1] = m2;
+			}
+            // else
+            // {
+            //     matrices = {m1, m2};
+            // }
+			
+			    
 			int half = n/2;
 			int count = 0;
 			int[][][] submatrices = new int[8][half][half];
+			
 			for (Matrix m : matrices) {
-				//TODO account for odd n
-				
+			    
+    			m.print(true);
+    			
 				for (int i = 0; i < n; i++) {
 					for (int j = 0; j < n; j++) {
 						if (i < half) {
@@ -198,6 +244,27 @@ public class Strassen {
         		Matrix strassenProduct = strassenMultiply(m3,m4,4,2);
         		convProduct.print(true);
         		strassenProduct.print(true);
+        		break;
+        	
+        	case 3:
+        		int[][] rows5 = {{17,24,1,8,15},{23,5,7,14,16},{4,6,13,20,22},{10,12,19,21,3},{11,18,25,2,9}};
+        		int[][] rows6 = {{17,23,4,10,11},{24,5,6,12,18},{1,7,13,19,25},{8,14,20,21,2},{15,16,22,3,9}};
+        		Matrix m5 = new Matrix(rows5);
+        		Matrix m6 = new Matrix(rows6);
+        		Matrix convProduct2 = conventionalMultiply(m5,m6);
+        		Matrix strassenProduct2 = strassenMultiply(m5,m6,5,2);
+        		convProduct2.print(true);
+        		strassenProduct2.print(true);
+        		break;
+        	case 4:
+        		int[][] rows7 = {{1,1,1},{1,1,1},{1,1,1}};
+        		int[][] rows8 = {{1,1,1},{1,1,1},{1,1,1}};
+        		Matrix m7 = new Matrix(rows7);
+        		Matrix m8 = new Matrix(rows8);
+        		Matrix convProduct3 = conventionalMultiply(m7,m8);
+        		Matrix strassenProduct3 = strassenMultiply(m7,m8,3,2);
+        		convProduct3.print(true);
+        		strassenProduct3.print(true);
         		break;
         }
 		
