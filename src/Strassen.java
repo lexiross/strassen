@@ -116,6 +116,18 @@ public class Strassen {
             m2.print(true);
             return m2;
     }
+    
+    private static Matrix strassen2(Matrix m1, Matrix m2, int top1, int bottom1, int left1, int right1, int top2, int bottom2, int left2, int right2, int crossover) {
+    	int n = bottom1 - top1;
+    	if (n <= crossover) {
+			return conventionalMultiply(m1, m2);
+		} else {
+			// TODO
+			int[][] dummyRows = {{0}};
+			Matrix dummy = new Matrix(dummyRows);
+			return dummy;
+		}
+    }
 	
 	private static Matrix strassenMultiply(Matrix m1, Matrix m2, int n, int crossover) {
 		if (n <= crossover) {
@@ -130,14 +142,14 @@ public class Strassen {
 			if ((2*n == (n^(n-1)) + 1) == false){
 			    int new_n = 2;
 			    while (new_n < n) {
-			        System.out.println(new_n);
 			        new_n *= 2;
 			    }
-			    int difference = new_n - n;
+			    System.out.println(new_n);
                 m1 = pad(m1, new_n, n);
                 m2 = pad(m2, new_n, n);
                 matrices[0] = m1;
                 matrices[1] = m2;
+                n = new_n;
 			}
             // else
             // {
