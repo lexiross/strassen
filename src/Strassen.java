@@ -68,6 +68,7 @@ public class Strassen {
 		int n = m1.n;
 		int[][] ret = new int[n][n];
 		// i is row, j is column
+		/*
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				int dotProduct = 0;
@@ -75,6 +76,18 @@ public class Strassen {
 					dotProduct += m1.rows[i][k]*m2.rows[k][j];
 				}
 				ret[i][j] = dotProduct;
+			}
+		}
+		*/
+		// improved caching performance
+		int x;
+		int i,j;
+		for (int k = 0; k < n; k++) {
+			for (i = 0; i < n; i++) {
+				x = m1.rows[i][k];
+				for (j = 0; j < n; j++) {
+					ret[i][j] += x * m2.rows[k][j];
+				}
 			}
 		}
 		return new Matrix(ret);
