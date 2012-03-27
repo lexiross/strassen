@@ -21,7 +21,6 @@ public class Strassen {
 	 * from the first.
 	 */
 	private static Matrix add(Matrix m1, Matrix m2, boolean addition) {
-		// TODO
 		int n = m1.n;
 		int[][] ret = new int[n][n];
 		for (int i = 0; i < n; i++) {
@@ -132,7 +131,7 @@ public class Strassen {
 			Matrix topLeft = add(add(p5, add(p4,p2,false), true), p6, true);
 			Matrix topRight = add(p1,p2,true);
 			Matrix bottomLeft = add(p3,p4,true);
-			Matrix bottomRight = add(p5, add(p1, add(p3,p7,false), false), true);
+			Matrix bottomRight = add(p5, add(p1, add(p3,p7,true), false), true);
 			return combine(topLeft, topRight, bottomLeft, bottomRight);
 		}
 	}
@@ -141,24 +140,70 @@ public class Strassen {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		int[][] rows1 = {{1,2},{3,4}};
-		int[][] rows2 = {{5,6},{7,8}};
-		Matrix m1 = new Matrix(rows1);
-		Matrix m2 = new Matrix(rows2);
-		Matrix sum = add(m1, m2, true);
-		Matrix diff = add(m1, m2, false);
-		Matrix product = conventionalMultiply(m1, m2);
-		Matrix combine = combine(m1, m1, m2, m2);
-		m1.print(true);
-		m2.print(true);
-		System.out.println("Sum:");
-		sum.print(true);
-		System.out.println("Difference:");
-		diff.print(true);
-		System.out.println("Product:");
-		product.print(true);
-		System.out.println("Combination:");
-		combine.print(true);
+		String usage = "Usage: ./strassen <version> <dimension> <inputfile>";
+        if (args.length != 3) {
+            System.out.println("Wrong number of arguments.");
+            System.out.println(usage);
+            return;
+        }
+        
+        int version = Integer.parseInt(args[0]);
+        int dimension = Integer.parseInt(args[1]);
+        String filename = args[2];
+        
+        switch (version) {
+        
+        	// grading version
+        	case 0:
+        		Matrix[] matrices = Matrix.createFromFile(filename);
+        		Matrix a = matrices[0];
+        		Matrix b = matrices[1];
+        		int crossover = 2;
+        		if (dimension != a.n || dimension != b.n) {
+        			System.out.println("Sanity check failed.");
+        		} else {
+        			Matrix product = strassenMultiply(a, b, dimension, crossover);
+        			product.print(false);
+        		}
+        		break;
+        		
+        	// testing helper functions
+        	case 1:
+        		int[][] rows1 = {{1,2},{3,4}};
+        		int[][] rows2 = {{5,6},{7,8}};
+        		Matrix m1 = new Matrix(rows1);
+        		Matrix m2 = new Matrix(rows2);
+        		Matrix sum = add(m1, m2, true);
+        		Matrix diff = add(m1, m2, false);
+        		Matrix product = conventionalMultiply(m1, m2);
+        		Matrix combine = combine(m1, m1, m2, m2);
+        		m1.print(true);
+        		m2.print(true);
+        		System.out.println("Sum:");
+        		sum.print(true);
+        		System.out.println("Difference:");
+        		diff.print(true);
+        		System.out.println("Product:");
+        		product.print(true);
+        		System.out.println("Combination:");
+        		combine.print(true);
+        		break;
+        		
+        	case 2:
+        		int[][] rows3 = {{1,2,3,4},{5,6,7,8},{9,10,11,12},{25,26,27,28}};
+        		int[][] rows4 = {{13,14,15,16},{17,18,19,20},{21,22,23,24},{29,30,31,32}};
+        		Matrix m3 = new Matrix(rows3);
+        		Matrix m4 = new Matrix(rows4);
+        		Matrix convProduct = conventionalMultiply(m3,m4);
+        		Matrix strassenProduct = strassenMultiply(m3,m4,4,2);
+        		convProduct.print(true);
+        		strassenProduct.print(true);
+        		break;
+        }
+		
+		
+		
+		
 	}
 
 }

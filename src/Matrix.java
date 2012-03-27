@@ -17,7 +17,7 @@ public class Matrix {
 		this.n = rows[0].length;
 	}
 	
-	public Matrix[] createFromFile(String filename, boolean firstHalf) {
+	public static Matrix[] createFromFile(String filename) {
 		int count = 0;
 		Matrix[] ret = new Matrix[2];
 		ArrayList<String> lines = new ArrayList<String>();
