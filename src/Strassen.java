@@ -139,10 +139,6 @@ public class Strassen {
                 matrices[0] = m1;
                 matrices[1] = m2;
 			}
-            // else
-            // {
-            //     matrices = {m1, m2};
-            // }
 			
 			    
 			int half = n/2;
