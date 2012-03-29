@@ -1,12 +1,4 @@
-/*
-import java.util.List;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-*/
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Matrix {
 	public int[][] rows;
@@ -18,48 +10,34 @@ public class Matrix {
 		this.n = rows[0].length;
 	}
 	
-	public static Matrix[] createFromFile(String filename) {
-		int count = 0;
+	public static Matrix[] createFromFile(String filename, int n) {
+		int numLines = 2*n*n;
 		Matrix[] ret = new Matrix[2];
-		ArrayList<String> lines = new ArrayList<String>();
+		//ArrayList<String> lines = new ArrayList<String>();
+		String[] lines = new String[numLines];
 		try {
 			FileReader input = new FileReader(filename);
 			BufferedReader reader = new BufferedReader(input);
-			String line = reader.readLine();
-			count++;
-			
-			while (line != null) {
-				lines.add(line);
-				line = reader.readLine();
-				count++;
+			for (int i = 0; i < numLines; i++) {
+				String line = reader.readLine();
+				lines[i] = line;
 			}
-			
+						
 			reader.close();
 			
 		} catch (FileNotFoundException e) {
+			System.out.println("File not found! Make sure it's in the same directory as the Makefile");
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-        // String[] linesArray = Arrays.asList(lines).toArray(new String[lines.length]);
-        // String[] linesArray = Arrays.copyOf(lines, lines.length, String[].class);
-        String[] linesArray = (String[]) lines.toArray();
-		int d = count/2;
-		int n = (int) Math.sqrt(d);
-		int k = 0;
 		int l = 0;
 		for (int i = 0; i < 2; i++) {
 			int[][] rows = new int[n][n];
-			int[] row = new int[n];
-			k = 0;
-			l = 0;
-			for (int j = d*i; j < d*i+d; j++) {
-				row[k] = Integer.parseInt(linesArray[j]);
-				k++;
-				if (k == n) {
-					k = 0;
-					rows[l] = row;
+			for (int j = 0; j < n; j++) {
+				for (int k = 0; k < n; k++) {
+					rows[j][k] = Integer.parseInt(lines[l]);
 					l++;
 				}
 			}
