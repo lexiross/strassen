@@ -540,7 +540,7 @@ public class Strassen {
         		System.out.println("Matrices of size " + dimension + ":");
         		int[][] rows9 = new int[dimension][dimension];
         		int[][] rows10 = new int[dimension][dimension];
-        		for (int k = 10; k < 150; k += 5) {
+        		for (int k = 150; k < 300; k += 5) {
         			Random rand = new Random(System.nanoTime());
         			for (int i = 0; i < dimension; i++) {
         				for (int j = 0; j < dimension; j++) {

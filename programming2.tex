@@ -91,14 +91,33 @@ $$n^2(2n-1) \approx \frac{7}{4}(n-1)n^2 + \frac{9n^2}{2}$$
 %lowest strassens greater, highest strassen's less
 \bigskip
 
-\noindent \textbf{Part 2 Writeup}
+\noindent \textbf{Experimental Analysis}
 \bigskip
+
+\includegraphics[scale=0.6]{512.pdf}
+
+\includegraphics[scale=0.6]{1024.pdf}
+
+\includegraphics[scale=0.6]{2048.pdf}
 
 \noindent \textbf{Optimizations}
 \bigskip
 
-\noindent \textbf{Padding}
+\noindent Coding in Java, we started off with a naive implementation. We decided to represent matrices using a thin wrapper class around two-dimensional integer arrays. We coded the conventional algorithm naively (see below), and for Strassen's algorithm, we simply followed the algorithm from the lecture notes, allocating new matrices for each of the 8 submatrices as well as each of the 7 products. However, after testing our code with large values, we realized that the algorithm was running quite slowly (up to 8 seconds for large values of n). We then made the following optimizations to our code:
 \medskip
+
+\noindent To improve the caching performance of the conventional algorithm, we noted that an ideal method would access all elements of each row before moving onto the next row, taking advantage of cache localization. However, the native implementation involves cycling through the rows of one matrix and the columns of another. We fixed this inefficiency by switching the order of the nested loops, which has the effect of cycling through the rows of both matrices, slowly building up each final entry by using k (the traditional inner loop) as the outermost loop. Rather than constructing each final dot product in a series of subsequent operations, we gradually build each dot product while obeying the natural iteration order (as dictated by hardware).
+\bigskip
+
+\noindent Next, we set out to improve the space performance of Strassen's algorithm. Instead of allocating new heap space for the submatrices, as we did initially, we allowed the two original matrices as data storage throughout the course of the algorithm, and simply mutated (and then reverted) certain parts of these two matrices. Instead of passing around smaller and smaller matrices to multiply into the function, as might be typical of a recursive pattern, we pass in the two original matrices to each recursive call, along with several other variables that determine the left and top bounds of each matrix to multiply as well as the size of these matrices (working with square matrices allowed us to cut some corners and pass fewer arguments). For example, we need to obtain the first product, p1, by multiplying A(F-H). We are given top1, left1, top2, and left2, which represent the top and left bounds of the outer matrices we are multiplying; we can think of these as offsets. In order to find p1, we first look at the upper right fourth of m2 (offset by top2 and left2) (F) and subtract each entry by the equivalent entry in the bottom right fourth (H). We then recursively call the Strassen algorithm, passing in top1 and left1 (those don't change since A is situated at the upper left corner), and top2 and (left2+half), where half=n/2. Once this recursive call returns a matrix (p1), we add the entries of p1 to the appropriate corner(s) of the return matrix (in this case, upper right and lower right). Finally, we then add the entries of H back into F, as a way of resetting before finding the next product. Note that we also save space by writing the results of the recursive call directly into what will become the return matrix. This way, we are free to overwrite p1 with the next product!
+\bigskip
+
+\noindent While it seems that this space-saving technique would cost us time because of all the iterations, it ended up running just as fast if not faster than our naive implementation. We suspect that this is because memory allocation actually takes up more time than iterating through a two-dimensional array. Before the improvement, in each level of recursion, we were allocating space for 19 matrices of size n/2 and 1 matrix of size n (the return value). Now, we allocate space for just 1 matrix of size n/2 (to store the products) and 1 matrix of size n (to store what will eventually be returned). While not asympotically significant, this is a very significant constant factor difference, particularly when dealing with very large matrices!
+
+\bigskip
+
+\noindent \textbf{Padding}
+\bigskip
 
 \noindent As our implementation must work even when $n$ is odd, our algorithm first checked whether the size of a matrix was a power of 2, and if it was not, it calculated the next highest power of 2 after the value $n$.  
 \medskip
