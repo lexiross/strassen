@@ -156,8 +156,8 @@ public class Strassen {
 					m2.rows[i+top2][j+left2+half] -= m2.rows[i+top2+half][j+left2+half];
 				}
 			}
-			System.out.println(n);
-			m2.print(true);
+            // System.out.println(n);
+            // m2.print(true);
 			// p1
 			tempProduct = strassen2(m1, m2, top1, left1, top2, left2+half, half, crossover);
 			// store p1 in product matrix
@@ -175,8 +175,8 @@ public class Strassen {
 			}
 			
 			if (n == 8) {
-				System.out.println("p1:");
-				tempProduct.print(true);
+                // System.out.println("p1:");
+                // tempProduct.print(true);
 			}
 
 			// add B to A
@@ -202,8 +202,8 @@ public class Strassen {
 			}
 			
 			if (n == 8) {
-				System.out.println("p2:");
-				tempProduct.print(true);
+                // System.out.println("p2:");
+                // tempProduct.print(true);
 			}
 			
 			// add D to C
@@ -229,8 +229,8 @@ public class Strassen {
 			}
 			
 			if (n == 8) {
-				System.out.println("p3:");
-				tempProduct.print(true);
+                // System.out.println("p3:");
+                // tempProduct.print(true);
 			}
 			
 			// subtract E from G
@@ -256,8 +256,8 @@ public class Strassen {
 			}
 			
 			if (n == 8) {
-				System.out.println("p4:");
-				tempProduct.print(true);
+                // System.out.println("p4:");
+                // tempProduct.print(true);
 			}
 			
 			// add D to A and H to E
@@ -285,8 +285,8 @@ public class Strassen {
 			}
 			
 			if (n == 8) {
-				System.out.println("p5:");
-				tempProduct.print(true);
+                // System.out.println("p5:");
+                // tempProduct.print(true);
 			}
 			
 			// subtract D from B and add H to G
@@ -313,8 +313,8 @@ public class Strassen {
 			}
 			
 			if (n == 8) {
-				System.out.println("p6:");
-				tempProduct.print(true);
+                // System.out.println("p6:");
+                // tempProduct.print(true);
 			}
 			
 			// subtract C from A and add F to E
@@ -341,8 +341,8 @@ public class Strassen {
 			}
 			
 			if (n == 8) {
-				System.out.println("p7:");
-				tempProduct.print(true);
+                // System.out.println("p7:");
+                // tempProduct.print(true);
 			}
 			
 			return new Matrix(productRows);
@@ -573,7 +573,8 @@ public class Strassen {
         			//m9.print(true);
         			//m10.print(true);
         			//mproduct.print(true);
-        			System.out.println("Crossover: " + k + "\tRunning time: " + seconds);
+                    // System.out.println("Crossover: " + k + "\tRunning time: " + seconds);
+        			System.out.println( k + "," + seconds);
         		}
         }
 		
