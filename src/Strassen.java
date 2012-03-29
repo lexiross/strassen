@@ -1,3 +1,5 @@
+import java.util.Random;
+
 
 public class Strassen {
 	
@@ -113,8 +115,18 @@ public class Strassen {
                 }
             }
             Matrix m2 = new Matrix(rows);
-            m2.print(true);
+            //m2.print(true);
             return m2;
+    }
+    
+    private static Matrix unpad(Matrix m, int x) {
+    	int[][] m2 = new int[x][x];
+    	for (int i = 0; i < x; i++) {
+    		for (int j = 0; j < x; j++) {
+    			m2[i][j] = m.rows[i][j];
+    		}
+    	}
+    	return new Matrix(m2);
     }
     
     private static Matrix strassen2(Matrix m1, Matrix m2, int top1, int bottom1, int left1, int right1, int top2, int bottom2, int left2, int right2, int crossover) {
@@ -123,6 +135,25 @@ public class Strassen {
 			return conventionalMultiply(m1, m2);
 		} else {
 			// TODO
+			Matrix[] matrices = {m1, m2};
+			
+			// divide both matrices into four submatrices
+			Matrix a,b,c,d,e,f,g,h;
+			
+			// then padding is required
+			if ((2*n == (n^(n-1)) + 1) == false){
+			    int new_n = 2;
+			    while (new_n < n) {
+			        new_n *= 2;
+			    }
+			    System.out.println(new_n);
+                m1 = pad(m1, new_n, n);
+                m2 = pad(m2, new_n, n);
+                matrices[0] = m1;
+                matrices[1] = m2;
+                n = new_n;
+			}
+			
 			int[][] dummyRows = {{0}};
 			Matrix dummy = new Matrix(dummyRows);
 			return dummy;
@@ -151,7 +182,11 @@ public class Strassen {
                 matrices[1] = m2;
                 n = new_n;
 			}
+<<<<<<< HEAD
 			
+=======
+
+>>>>>>> 6914faa1a8fb4a2b0fa499449e396e9d12ef60bf
 			    
 			int half = n/2;
 			int count = 0;
@@ -159,7 +194,7 @@ public class Strassen {
 			
 			for (Matrix m : matrices) {
 			    
-    			m.print(true);
+    			//m.print(true);
     			
 				for (int i = 0; i < n; i++) {
 					for (int j = 0; j < n; j++) {
@@ -201,6 +236,15 @@ public class Strassen {
 			Matrix bottomRight = add(p5, add(p1, add(p3,p7,true), false), true);
 			return combine(topLeft, topRight, bottomLeft, bottomRight);
 		}
+	}
+	
+	private static Matrix strassen(Matrix m1, Matrix m2, int crossover) {
+		int n = m1.n;
+		Matrix product = strassenMultiply(m1, m2, n, crossover);
+		if ((2*n == (n^(n-1)) + 1) == false){
+            product = unpad(product, n);
+		}
+		return product;
 	}
 
 	/**
@@ -273,8 +317,10 @@ public class Strassen {
         		Matrix m5 = new Matrix(rows5);
         		Matrix m6 = new Matrix(rows6);
         		Matrix convProduct2 = conventionalMultiply(m5,m6);
-        		Matrix strassenProduct2 = strassenMultiply(m5,m6,5,2);
+        		Matrix oldStrassen2 = strassenMultiply(m5,m6,5,2);
+        		Matrix strassenProduct2 = strassen(m5,m6,2);
         		convProduct2.print(true);
+        		oldStrassen2.print(true);
         		strassenProduct2.print(true);
         		break;
         	case 4:
@@ -287,6 +333,30 @@ public class Strassen {
         		convProduct3.print(true);
         		strassenProduct3.print(true);
         		break;
+        	case 5:
+        		int[][] rows9 = new int[dimension][dimension];
+        		int[][] rows10 = new int[dimension][dimension];
+        		for (int k = 2; k < 100; k += 5) {
+        			Random rand = new Random(System.nanoTime());
+        			for (int i = 0; i < dimension; i++) {
+        				for (int j = 0; j < dimension; j++) {
+        					double random1 = rand.nextDouble();
+        					double random2 = rand.nextDouble();
+        					rows9[i][j] = (random1 < 0.5) ? 0 : 1;
+        					rows10[i][j] = (random2 < 0.5) ? 0 : 1;
+        				}
+        			}
+        			Matrix m9 = new Matrix(rows9);
+        			Matrix m10 = new Matrix(rows10);
+        			long start = System.nanoTime();
+        			Matrix mproduct = strassenMultiply(m9, m10, dimension, k);
+        			long elapsed = System.nanoTime() - start;
+        			double seconds = (double)elapsed / 1000000000.0;
+        			//m9.print(true);
+        			//m10.print(true);
+        			//mproduct.print(true);
+        			System.out.println("Crossover: " + k + "\tRunning time: " + seconds);
+        		}
         }
 		
 		
