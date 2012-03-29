@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 */
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Matrix {
 	public int[][] rows;
@@ -41,7 +42,9 @@ public class Matrix {
 			e.printStackTrace();
 		}
 		
-		String[] linesArray = (String[]) lines.toArray();
+        // String[] linesArray = Arrays.asList(lines).toArray(new String[lines.length]);
+        // String[] linesArray = Arrays.copyOf(lines, lines.length, String[].class);
+        String[] linesArray = (String[]) lines.toArray();
 		int d = count/2;
 		int n = (int) Math.sqrt(d);
 		int k = 0;

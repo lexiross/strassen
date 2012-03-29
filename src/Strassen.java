@@ -81,7 +81,7 @@ public class Strassen {
 			}
 		}
 		*/
-		// improved caching performance
+		// improved caching performance NICE!
 		int x;
 		int i,j;
 		for (int k = 0; k < n; k++) {
@@ -182,11 +182,11 @@ public class Strassen {
                 matrices[1] = m2;
                 n = new_n;
 			}
-<<<<<<< HEAD
-			
-=======
-
->>>>>>> 6914faa1a8fb4a2b0fa499449e396e9d12ef60bf
+// <<<<<<< HEAD
+//          
+// =======
+// 
+// >>>>>>> 6914faa1a8fb4a2b0fa499449e396e9d12ef60bf
 			    
 			int half = n/2;
 			int count = 0;
