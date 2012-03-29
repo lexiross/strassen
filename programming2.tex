@@ -30,13 +30,7 @@
 \begin{flushright} Lexi Ross \& Julia Winn  \end{flushright}
 
  \vspace{-4mm} 
-\noindent \textbf{Part 1}
-\medskip
-
-\noindent When comparing the running times of Strassen's algorithm with conventional matrix multiplication an important factor to consider is the necessary padding when running Strassen's algorithm on values of $n$ that are not powers of 2.  This can be dealt with using padding, as long as the current $n$ is even, we can divide it into equal sub matrices, and when it is odd we must pad each matrix of this size with an additional $(2n+1)$ zeros to get an even value of $n$.
-\medskip
-
-\noindent Whether or not this process takes place at the beginning of the algorithm before the sub dividing of the matrix has begun does not change the total number of zeros added.  Therefore, regardless of the nature of the process, any matrix with a non-power of 2 $n$ will need a certain number of zeros added.  The final size of the matrix post padding is the size of the matrix we will be multiplying.
+\noindent \textbf{Part 1 Writeup}
 \medskip
 
 \noindent If all arithmetic operations (adding, subtracting, multiplying or dividing two real numbers) is cost 1, then we can calculate the recurrence for Strassen's algorithm by computing the base case, and all powers of $n$ that follow.
@@ -70,19 +64,49 @@
 
 $$T(n) = 7^{\frac{\log(2n)}{\log(2)}} - 6n^2$$
 
-\noindent We know that for regular divide and conquer matrix multiplication the recurrence relation is $T(n) = 8\cdot T(\frac{n}{2}) + \Theta(n^2)$,  $\Theta= 4$
+\noindent However we don't actually want the recurrence relation because this will not take into account the crossover point.  Any value of $n$ we plug in will only return the total cost if we were \emph{only} using Strassen's algorithm, which will be much higher than a combination where we eventually switch to normal matrix multiplication.
+\bigskip
+
+\noindent However, because our normal matrix multiplication will go all the way down to the base case of 1, we \emph{do} want to solve the recurrence relation for regular matrix multiplication.  
 \medskip
-% \vspace{-3mm} 
-%\begin{itemize}  \itemsep1pt \parskip0pt \parsep0pt
 
-%Padding info: http://www.eecis.udel.edu/~saunders/courses/621/03f/modelV.pdf
+\noindent One "even conventional" algorithm for multiplying matrices is the sum over the rows and columns where 
+$$c_{i,k} = \sum_k a_{ij} \cdot b_{jk}$$
 
-\noindent Using Mathematica again we can solve for the recurrence relation to find:
-$$T(n) = n^2(5n-4)$$
+\noindent The complexity is roughly $2n^3$ but more specifically $n^2(2n-1)$ because every item takes $n$ multiplications and $n-1$ sums.  You can also find this by solving for the recurrence relation $T(n) = n^2 + 8T(\frac{n}{2}) \to T(n) = n^2(2n-1)$
+\bigskip
 
-\noindent Using Mathematica again
+\noindent Now our goal is to either find the lowest value of n such that using Strassen's algorithm will yield a greater value than just using conventional matrix multiplication or the highest value where using 
+\medskip
 
-$$7^{(\log_2(2 n))/(\log_2(2))}-6 n^2 = n^2*(5n - 4) \to n \approx 2.98666 \approx 3$$
+\noindent We want to solve for:
 
+$$n^2(2n-1) \approx 7 \cdot \bigg( \frac{n}{2}\bigg)^2\bigg(2\frac{n}{2}-1\bigg) + 18\bigg( \frac{n}{2}\bigg)^2$$
+
+$$n^2(2n-1) \approx \frac{7}{4}(n-1)n^2 + \frac{9n^2}{2}$$
+
+\smallskip
+\noindent Plugging this into Wolfram Alpha we find $n\approx15$, so theoretically it is optimal to use Strassen's algorithm at the crossover point of $\approx$ 15 and greater.  However because to use Strassen's algorithm any number that is not a power of 2 will need to eventually be padded so that it becomes one, so all numbers greater than 8 and less than 16 will be padded with zeros until they are 16 by 16 matrices.
+
+%lowest strassens greater, highest strassen's less
+\bigskip
+
+\noindent \textbf{Part 2 Writeup}
+\bigskip
+
+\noindent \textbf{Optimizations}
+\bigskip
+
+\noindent \textbf{Padding}
+\medskip
+
+\noindent As our implementation must work even when $n$ is odd, our algorithm first checked whether the size of a matrix was a power of 2, and if it was not, it calculated the next highest power of 2 after the value $n$.  
+\medskip
+
+\noindent When comparing the running times of Strassen's algorithm with conventional matrix multiplication an important factor to consider is the necessary padding when running Strassen's algorithm on values of $n$ that are not powers of 2.  This can be dealt with using padding, as long as the current $n$ is even, we can divide it into equal sub matrices, and when it is odd we must pad each matrix of this size with an additional $(2n+1)$ zeros to get an even value of $n$.
+\medskip
+
+\noindent Whether or not this process takes place at the beginning of the algorithm before the sub dividing of the matrix has begun does not change the total number of zeros added.  Therefore, regardless of the nature of the process, any matrix with a non-power of 2 $n$ will need a certain number of zeros added.  The final size of the matrix post padding is the size of the matrix we will be multiplying.
+\medskip
 
 \end{document}
