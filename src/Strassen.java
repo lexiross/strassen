@@ -37,6 +37,9 @@ public class Strassen {
 		return new Matrix(ret);
 	}
 	
+	/*
+	 * Helper method for concatenating two arrays
+	 */
 	private static int[] concat(int[] a, int[] b) {
 		int[] c = new int[a.length+b.length];
 		System.arraycopy(a, 0, c, 0, a.length);
@@ -48,16 +51,12 @@ public class Strassen {
 	private static Matrix combine(Matrix a, Matrix b, Matrix c, Matrix d) {
 		int half = a.n;		
 		int n = 2*half;
-		int[][] rowsA = a.rows;
-		int[][] rowsB = b.rows;
-		int[][] rowsC = c.rows;
-		int[][] rowsD = d.rows;
 		int[][] ret = new int[n][n];
 		for (int i = 0; i < n; i++) {
 			if (i < half) {
-				ret[i] = concat(rowsA[i], rowsB[i]);
+				ret[i] = concat(a.rows[i], b.rows[i]);
 			} else {
-				ret[i] = concat(rowsC[i-half], rowsD[i-half]);
+				ret[i] = concat(c.rows[i-half], d.rows[i-half]);
 			}
 		}
 		return new Matrix(ret);
@@ -129,34 +128,225 @@ public class Strassen {
     	return new Matrix(m2);
     }
     
-    private static Matrix strassen2(Matrix m1, Matrix m2, int top1, int bottom1, int left1, int right1, int top2, int bottom2, int left2, int right2, int crossover) {
-    	int n = bottom1 - top1;
+    private static Matrix strassen2(Matrix m1, Matrix m2, int top1, int left1, int top2, int left2, int n, int crossover) {
     	if (n <= crossover) {
-			return conventionalMultiply(m1, m2);
+    		int[][] rows1 = new int[n][n];
+    		int[][] rows2 = new int[n][n];
+    		for (int i = 0; i < n; i++) {
+    			for (int j = 0; j < n; j++) {
+    				rows1[i][j] = m1.rows[i+top1][j+left1];
+    				rows2[i][j] = m2.rows[i+top2][j+left2];
+    			}
+    		}
+    		Matrix m3 = new Matrix(rows1);
+    		Matrix m4 = new Matrix(rows2);
+			return conventionalMultiply(m3, m4);
 		} else {
-			// TODO
-			Matrix[] matrices = {m1, m2};
 			
-			// divide both matrices into four submatrices
-			Matrix a,b,c,d,e,f,g,h;
 			
-			// then padding is required
-			if ((2*n == (n^(n-1)) + 1) == false){
-			    int new_n = 2;
-			    while (new_n < n) {
-			        new_n *= 2;
-			    }
-			    System.out.println(new_n);
-                m1 = pad(m1, new_n, n);
-                m2 = pad(m2, new_n, n);
-                matrices[0] = m1;
-                matrices[1] = m2;
-                n = new_n;
+			
+			int half = n/2;
+			int[][] productRows = new int[n][n];
+			int[][] tempRows = new int[half][half];
+			Matrix tempProduct = new Matrix(tempRows);
+			
+			// subtract H from F
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					m2.rows[i+top2][j+left2+half] -= m2.rows[i+top2+half][j+left2+half];
+				}
+			}
+			System.out.println(n);
+			m2.print(true);
+			// p1
+			tempProduct = strassen2(m1, m2, top1, left1, top2, left2+half, half, crossover);
+			// store p1 in product matrix
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					productRows[i][j+half] = tempProduct.rows[i][j];
+					productRows[i+half][j+half] = tempProduct.rows[i][j];
+				}
+			}
+			// reset (add H back to F)
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					m2.rows[i+top2][j+left2+half] += m2.rows[i+top2+half][j+left2+half];
+				}
 			}
 			
-			int[][] dummyRows = {{0}};
-			Matrix dummy = new Matrix(dummyRows);
-			return dummy;
+			if (n == 8) {
+				System.out.println("p1:");
+				tempProduct.print(true);
+			}
+
+			// add B to A
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					m1.rows[i+top1][j+left1] += m1.rows[i+top1][j+left1+half];
+				}
+			}
+			// p2
+			tempProduct = strassen2(m1, m2, top1, left1, top2+half, left2+half, half, crossover);
+			// store p2 in product matrix
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					productRows[i][j+half] += tempProduct.rows[i][j];
+					productRows[i][j] = (-1)*tempProduct.rows[i][j];
+				}
+			}
+			// reset (subtract B from A)
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					m1.rows[i+top1][j+left1] -= m1.rows[i+top1][j+left1+half];
+				}
+			}
+			
+			if (n == 8) {
+				System.out.println("p2:");
+				tempProduct.print(true);
+			}
+			
+			// add D to C
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					m1.rows[i+top1+half][j+left1] += m1.rows[i+top1+half][j+left1+half];
+				}
+			}
+			// p3
+			tempProduct = strassen2(m1, m2, top1+half, left1, top2, left2, half, crossover);
+			// store p3 in product matrix
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					productRows[i+half][j] = tempProduct.rows[i][j];
+					productRows[i+half][j+half] -= tempProduct.rows[i][j];
+				}
+			}
+			// reset (subtract D from C)
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					m1.rows[i+top1+half][j+left1] -= m1.rows[i+top1+half][j+left1+half];
+				}
+			}
+			
+			if (n == 8) {
+				System.out.println("p3:");
+				tempProduct.print(true);
+			}
+			
+			// subtract E from G
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					m2.rows[i+top2+half][j+left2] -= m2.rows[i+top2][j+left2];
+				}
+			}
+			// p4
+			tempProduct = strassen2(m1, m2, top1+half, left1+half, top2+half, left2, half, crossover);
+			// store p4 in product matrix
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					productRows[i][j] += tempProduct.rows[i][j];
+					productRows[i+half][j] += tempProduct.rows[i][j];
+				}
+			}
+			// reset (add E to G)
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					m2.rows[i+top2+half][j+left2] += m2.rows[i+top2][j+left2];
+				}
+			}
+			
+			if (n == 8) {
+				System.out.println("p4:");
+				tempProduct.print(true);
+			}
+			
+			// add D to A and H to E
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					m1.rows[i+top1][j+left1] += m1.rows[i+top1+half][j+left1+half];
+					m2.rows[i+top2][j+left2] += m2.rows[i+top2+half][j+left2+half];
+				}
+			}
+			// p5
+			tempProduct = strassen2(m1, m2, top1, left1, top2, left2, half, crossover);
+			// store p5 in product matrix
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					productRows[i][j] += tempProduct.rows[i][j];
+					productRows[i+half][j+half] += tempProduct.rows[i][j];
+				}
+			}
+			// reset (subtract D from A and H from E)
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					m1.rows[i+top1][j+left1] -= m1.rows[i+top1+half][j+left1+half];
+					m2.rows[i+top2][j+left2] -= m2.rows[i+top2+half][j+left2+half];
+				}
+			}
+			
+			if (n == 8) {
+				System.out.println("p5:");
+				tempProduct.print(true);
+			}
+			
+			// subtract D from B and add H to G
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					m1.rows[i+top1][j+left1+half] -= m1.rows[i+top1+half][j+left1+half];
+					m2.rows[i+top2+half][j+left2] += m2.rows[i+top2+half][j+left2+half];
+				}
+			}
+			// p6
+			tempProduct = strassen2(m1, m2, top1, left1+half, top2+half, left2, half, crossover);
+			// store p6 in product matrix
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					productRows[i][j] += tempProduct.rows[i][j];
+				}
+			}
+			// reset (add D to B and subtract H from G)
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					m1.rows[i+top1][j+left1+half] += m1.rows[i+top1+half][j+left1+half];
+					m2.rows[i+top2+half][j+left2] -= m2.rows[i+top2+half][j+left2+half];
+				}
+			}
+			
+			if (n == 8) {
+				System.out.println("p6:");
+				tempProduct.print(true);
+			}
+			
+			// subtract C from A and add F to E
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					m1.rows[i+top1][j+left1] -= m1.rows[i+top1+half][j+left1];
+					m2.rows[i+top2][j+left2] += m2.rows[i+top2][j+left2+half];
+				}
+			}
+			// p7
+			tempProduct = strassen2(m1, m2, top1, left1, top2, left2, half, crossover);
+			// store p7 in product matrix
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					productRows[i+half][j+half] -= tempProduct.rows[i][j];
+				}
+			}
+			// reset (add C to A and subtract F from E)
+			for (int i = 0; i < half; i++) {
+				for (int j = 0; j < half; j++) {
+					m1.rows[i+top1][j+left1] += m1.rows[i+top1+half][j+left1];
+					m2.rows[i+top2][j+left2] -= m2.rows[i+top2][j+left2+half];
+				}
+			}
+			
+			if (n == 8) {
+				System.out.println("p7:");
+				tempProduct.print(true);
+			}
+			
+			return new Matrix(productRows);
+
 		}
     }
 	
@@ -182,11 +372,6 @@ public class Strassen {
                 matrices[1] = m2;
                 n = new_n;
 			}
-// <<<<<<< HEAD
-//          
-// =======
-// 
-// >>>>>>> 6914faa1a8fb4a2b0fa499449e396e9d12ef60bf
 			    
 			int half = n/2;
 			int count = 0;
@@ -230,6 +415,22 @@ public class Strassen {
 			Matrix p5 = strassenMultiply(add(a,d,true), add(e,h,true), half, crossover);
 			Matrix p6 = strassenMultiply(add(b,d,false), add(g,h,true), half, crossover);
 			Matrix p7 = strassenMultiply(add(a,c,false), add(e,f,true), half, crossover);
+			if (n == 8) {
+				System.out.println("p1:");
+				p1.print(true);
+				System.out.println("p2:");
+				p2.print(true);
+				System.out.println("p3:");
+				p3.print(true);
+				System.out.println("p4:");
+				p4.print(true);
+				System.out.println("p5:");
+				p5.print(true);
+				System.out.println("p6:");
+				p6.print(true);
+				System.out.println("p7:");
+				p7.print(true);
+			}
 			Matrix topLeft = add(add(p5, add(p4,p2,false), true), p6, true);
 			Matrix topRight = add(p1,p2,true);
 			Matrix bottomLeft = add(p3,p4,true);
@@ -240,9 +441,24 @@ public class Strassen {
 	
 	private static Matrix strassen(Matrix m1, Matrix m2, int crossover) {
 		int n = m1.n;
-		Matrix product = strassenMultiply(m1, m2, n, crossover);
+		int small_n = n;
+		boolean padding = false;
+		// then padding is required
 		if ((2*n == (n^(n-1)) + 1) == false){
-            product = unpad(product, n);
+			padding = true;
+			int new_n = 2;
+			while (new_n < n) {
+				new_n *= 2;
+			}
+			//System.out.println(new_n);
+			m1 = pad(m1, new_n, n);
+			m2 = pad(m2, new_n, n);
+			n = new_n;
+		}
+		//Matrix product = strassenMultiply(m1, m2, n, crossover);
+		Matrix product = strassen2(m1, m2, 0, 0, 0, 0, n, crossover);
+		if (padding){
+            product = unpad(product, small_n);
 		}
 		return product;
 	}
@@ -266,15 +482,16 @@ public class Strassen {
         
         	// grading version
         	case 0:
-        		Matrix[] matrices = Matrix.createFromFile(filename);
+        		Matrix[] matrices = Matrix.createFromFile(filename, dimension);
         		Matrix a = matrices[0];
         		Matrix b = matrices[1];
         		int crossover = 2;
         		if (dimension != a.n || dimension != b.n) {
         			System.out.println("Sanity check failed.");
         		} else {
-        			Matrix product = strassenMultiply(a, b, dimension, crossover);
+        			Matrix product = strassen(a, b, crossover);
         			product.print(false);
+        			product.print(true);
         		}
         		break;
         		
@@ -306,7 +523,7 @@ public class Strassen {
         		Matrix m3 = new Matrix(rows3);
         		Matrix m4 = new Matrix(rows4);
         		Matrix convProduct = conventionalMultiply(m3,m4);
-        		Matrix strassenProduct = strassenMultiply(m3,m4,4,2);
+        		Matrix strassenProduct = strassen(m3,m4,2);
         		convProduct.print(true);
         		strassenProduct.print(true);
         		break;
@@ -329,14 +546,15 @@ public class Strassen {
         		Matrix m7 = new Matrix(rows7);
         		Matrix m8 = new Matrix(rows8);
         		Matrix convProduct3 = conventionalMultiply(m7,m8);
-        		Matrix strassenProduct3 = strassenMultiply(m7,m8,3,2);
+        		Matrix strassenProduct3 = strassen(m7,m8,2);
         		convProduct3.print(true);
         		strassenProduct3.print(true);
         		break;
         	case 5:
+        		System.out.println("Matrices of size " + dimension + ":");
         		int[][] rows9 = new int[dimension][dimension];
         		int[][] rows10 = new int[dimension][dimension];
-        		for (int k = 2; k < 100; k += 5) {
+        		for (int k = 10; k < 150; k += 5) {
         			Random rand = new Random(System.nanoTime());
         			for (int i = 0; i < dimension; i++) {
         				for (int j = 0; j < dimension; j++) {
@@ -349,7 +567,7 @@ public class Strassen {
         			Matrix m9 = new Matrix(rows9);
         			Matrix m10 = new Matrix(rows10);
         			long start = System.nanoTime();
-        			Matrix mproduct = strassenMultiply(m9, m10, dimension, k);
+        			Matrix mproduct = strassen(m9, m10, k);
         			long elapsed = System.nanoTime() - start;
         			double seconds = (double)elapsed / 1000000000.0;
         			//m9.print(true);
