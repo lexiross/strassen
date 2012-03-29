@@ -67,4 +67,19 @@ public class Matrix {
 		}
 		System.out.println();
 	}
+	
+	/*
+	 * Checks whether a matrix is the zero matrix.
+	 * 
+	 */
+	public boolean isZero() {
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				if (rows[i][j] != 0) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 }

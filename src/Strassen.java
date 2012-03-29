@@ -4,20 +4,6 @@ import java.util.Random;
 public class Strassen {
 	
 	/*
-	 * Takes the dot product of two vectors.
-	 * Just realized we may not actually need this, but
-	 * I'm keeping it here just in case.
-	 */
-	private static int dotProduct(int[] v1, int[] v2) {
-		int n = v1.length;
-		int total = 0;
-		for (int i = 0; i < n; i++) {
-			total += v1[i] + v2[i];
-		}
-		return total;
-	}
-	
-	/*
 	 * Adds/subtracts two matrices and returns the result. If the last
 	 * parameter is set to false, the second matrix will be subtracted
 	 * from the first.
@@ -568,6 +554,11 @@ public class Strassen {
         			Matrix m10 = new Matrix(rows10);
         			long start = System.nanoTime();
         			Matrix mproduct = strassen(m9, m10, k);
+        			Matrix compare = strassenMultiply(m9, m10, dimension, k);
+        			Matrix difference = add(mproduct, compare, false);
+        			if (!difference.isZero()) {
+        				System.out.println("EEEEK!");
+        			}
         			long elapsed = System.nanoTime() - start;
         			double seconds = (double)elapsed / 1000000000.0;
         			//m9.print(true);
